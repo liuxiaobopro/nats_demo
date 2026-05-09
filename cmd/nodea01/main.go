@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log/slog"
-	"nats_demo/domain"
 	"os"
 	"time"
 
@@ -19,7 +18,13 @@ func main() {
 	defer nc.Drain()
 
 	for i := 0; ; i++ {
-		err := nc.Publish(fmt.Sprintf(domain.SubjectPrefix, "org_b"), fmt.Appendf(nil, "pay %d", i))
+		err := nc.PublishMsg(&nats.Msg{
+			Subject: "dn.org_b.pay",
+			Data:    fmt.Appendf(nil, "pay %d", i),
+			Header: nats.Header{
+				"X-From-ID": []string{"123"},
+			},
+		})
 		if err != nil {
 			slog.Error("publish message failed", "error", err)
 			continue

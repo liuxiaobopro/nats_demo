@@ -1,7 +1,7 @@
 package domain
 
 const (
-	StreamName = "SERVICE_PAY"
+	StreamName = "PSI"
 
 	QueueName = "PAY_QUEUE"
 

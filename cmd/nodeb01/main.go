@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
-	"nats_demo/domain"
 	"os"
 	"os/signal"
 
@@ -18,8 +16,10 @@ func main() {
 	}
 	defer nc.Drain()
 
-	nc.Subscribe(fmt.Sprintf(domain.SubjectPrefix, "org_b"), func(m *nats.Msg) {
-		slog.Info("recv", "message", string(m.Data))
+	nc.Subscribe("dn.org_b.*", func(m *nats.Msg) {
+		slog.Info("recv", "message", string(m.Data), "subject", m.Subject, "header", m.Header)
+
+		m.Ack()
 	})
 
 	sig := make(chan os.Signal, 1)
