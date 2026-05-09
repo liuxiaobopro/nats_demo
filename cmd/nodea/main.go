@@ -26,8 +26,7 @@ func main() {
 	}
 
 	if _, err := js.AddStream(&nats.StreamConfig{
-		Name:     domain.StreamName,
-		Subjects: []string{fmt.Sprintf(domain.SubjectPrefix, "org_b")},
+		Name: domain.StreamName,
 	},
 	); err != nil && !errors.Is(err, nats.ErrStreamNameAlreadyInUse) {
 		slog.Error("add stream failed", "error", err)
@@ -35,11 +34,18 @@ func main() {
 	}
 
 	for i := 0; ; i++ {
-		ack, err := js.Publish(fmt.Sprintf(domain.SubjectPrefix, "org_b"), fmt.Appendf(nil, "pay %d", i))
+		ack, err := js.PublishMsg(&nats.Msg{
+			Subject: "dn.org_b.pay",
+			Data:    fmt.Appendf(nil, "pay %d", i),
+			Header: nats.Header{
+				"X-From-ID": []string{"123"},
+			},
+		})
 		if err != nil {
 			slog.Error("publish message failed", "error", err)
 			continue
 		}
+
 		slog.Info("pub", "message", fmt.Sprintf("pay %d", i), "ack", ack)
 		time.Sleep(time.Second)
 	}

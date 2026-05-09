@@ -1,6 +1,6 @@
 module nats_demo
 
-go 1.26.2
+go 1.26
 
 require github.com/nats-io/nats.go v1.52.0
 

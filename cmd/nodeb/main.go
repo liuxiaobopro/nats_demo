@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"nats_demo/domain"
 	"os"
@@ -25,17 +24,18 @@ func main() {
 		os.Exit(1)
 	}
 	if _, err := js.AddStream(&nats.StreamConfig{
-		Name:     domain.StreamName,
-		Subjects: []string{fmt.Sprintf(domain.SubjectPrefix, "org_b")},
+		Name: domain.StreamName,
+		Subjects: []string{
+			"dn.org_b.*",
+		},
 	},
 	); err != nil && !errors.Is(err, nats.ErrStreamNameAlreadyInUse) {
 		slog.Error("add stream failed", "error", err)
 		os.Exit(1)
 	}
 
-	queue := domain.QueueName
-	js.QueueSubscribe(fmt.Sprintf(domain.SubjectPrefix, "org_b"), queue, func(m *nats.Msg) {
-		slog.Info("recv", "message", string(m.Data))
+	js.QueueSubscribe("dn.org_b.*", "", func(m *nats.Msg) {
+		slog.Info("recv", "message", string(m.Data), "subject", m.Subject, "header", m.Header)
 	})
 
 	sig := make(chan os.Signal, 1)
