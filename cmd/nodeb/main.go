@@ -34,7 +34,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	js.QueueSubscribe("dn.org_b.*", "", func(m *nats.Msg) {
+	js.Subscribe("dn.org_b.*", func(m *nats.Msg) {
 		slog.Info("recv", "message", string(m.Data), "subject", m.Subject, "header", m.Header)
 	})
 
